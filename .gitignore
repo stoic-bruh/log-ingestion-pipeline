@@ -4,3 +4,5 @@ __pycache__/
 logs.csv
 logs.txt
 app.log
+dead_letter.txt
+logs_backup.txt
