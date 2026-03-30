@@ -1,0 +1,8 @@
+- Most logs are INFO (~85%), indicating normal behavior
+- billing-api shows higher error rate compared to others
+- Response time has long tail → potential latency spikes
+- ~20% of logs exceed 400ms → anomaly candidates
+- Isolation Forest detected ~X anomalies (~20% of data)
+- Majority of slow requests (>800ms) were correctly identified
+- Most 500 status codes flagged as anomalies
+- Some normal logs misclassified → expected behavior
