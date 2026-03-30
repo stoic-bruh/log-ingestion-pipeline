@@ -45,7 +45,7 @@ def generate_sample_log():
 
 # --- Execution ---
 # Generate 5 sample logs and print as JSON
-for _ in range(5000):
+for _ in range(10000):
     log = generate_sample_log()
 
     try:

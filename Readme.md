@@ -1,131 +1,129 @@
-AI-Powered Log Ingestion and Anomaly Detection Pipeline:
+Log Ingestion Pipeline with ML-based Anomaly Detection
 Overview
-This project implements a production-style log ingestion pipeline combined with machine learning-based anomaly detection.
-It simulates real-world distributed systems where logs are generated, processed asynchronously, stored efficiently, and analyzed for anomalies.
-
-Problem Statement:
-Modern systems generate large volumes of logs. Detecting failures, latency spikes, and abnormal behavior manually is inefficient.
-
-This project aims to:
-Build a scalable log ingestion system
-Ensure fault tolerance and reliability
-Apply unsupervised machine learning to detect anomalies
-
+Modern distributed systems generate massive volumes of logs. Identifying anomalies in these logs is critical for detecting failures, performance issues, and security risks.
+This project builds a production-style log ingestion pipeline and explores the use of unsupervised machine learning (Isolation Forest) to detect anomalies in structured log data.
 
 System Architecture
-Log Generator → FastAPI → Redis Queue → Worker → PostgreSQL → CSV → ML Model
-
-Components:
-FastAPI: Validates and ingests logs
-Redis: Acts as a buffer/queue for decoupling
-Worker: Processes logs asynchronously with batching
-PostgreSQL: Persistent structured storage
-CSV Export: Dataset for ML
-Isolation Forest: Anomaly detection
-
+Log Generator → FastAPI → Redis Queue → Worker → PostgreSQL → CSV → ML Analysis
 
 Features:
-
-Backend System
-Structured logging (ML-ready schema)
-Input validation using Pydantic
-Retry logic for Redis failures
-Backup file handling for fault tolerance
-
-Worker Processing
-Batch insertion into database
-Backpressure handling
-Buffer-based processing
-Graceful degradation when database is unavailable
-
-Observability
-Throughput tracking
-Success/failure metrics
-Logging for monitoring and debugging
+FastAPI-based log ingestion API
+Redis queue for decoupling ingestion and processing
+Worker with buffering, retry logic, and fault tolerance
+PostgreSQL for persistent storage
+CSV export for ML analysis
+Isolation Forest for anomaly detection
+Basic visualization of log patterns
 
 
-Dataset
-
-Generated approximately 5000 logs with:
-Normal logs (~80%)
-Error logs (HTTP 500)
-Performance anomalies (response_time > 800ms)
-Multiple services (auth, billing, inventory, gateway)
+Dataset Generation:
+Synthetic logs generated to simulate distributed systems
 
 
-Machine Learning Approach
-Model Used
-Isolation Forest (Unsupervised Learning)
-
-Features
+Fields included:
+timestamp
+service_name
+endpoint
 response_time_ms
 status_code
-service_name (encoded)
+level
+message
 
-Rationale
-Works without labeled data
-Efficient for large datasets
-Suitable for anomaly detection in log data
+
+
+Total logs generated: 15,000+
+
+
+
+Methodology
+Extracted numerical features:
+response_time_ms
+status_code
+
+
+Applied:
+Isolation Forest (unsupervised anomaly detection)
+
+
+
+Model configuration:
+contamination = 0.1
+
+
 
 
 Results
-Total logs: ~5000
-Detected anomalies: ~999 (~20%)
-Slow logs detected: ~27%
-Strong detection of error (500) logs
+Total logs: 15,005
+Anomalies detected: 1,501
+Anomaly rate: ~10%
+
+Key Observations:
+The model detected ~10% anomalies, consistent with the contamination parameter
+Extreme response times were the primary driver of anomalies
+Status codes had limited influence on anomaly detection
+The model selected the most "unusual" points rather than discovering true anomalies
 
 
-Key Insights
-Majority of logs are normal (status 200)
-Certain services (e.g., inventory-db) show higher failure rates
-Response time distribution shows a long tail (latency spikes)
-Model performance decreases when anomaly ratio is high
+Insights:
+Isolation Forest requires a predefined anomaly ratio, which may not reflect real-world scenarios
+Numerical features dominated anomaly detection behavior
+Uniform synthetic data limited meaningful separation between normal and anomalous patterns
 
 
 Limitations
-High anomaly ratio reduces model effectiveness
-Limited feature set (no temporal features)
-Simulated data does not capture real-world noise fully
-Presence of false positives
+Synthetic dataset (not real-world logs)
+Limited feature set (no request context, user data, etc.)
+No temporal or sequence-based analysis
+Isolation Forest sensitivity to contamination parameter
+Lack of labeled ground truth for evaluation
 
 
-Future Improvements
-Add time-series features
-Use advanced models such as LSTM or Autoencoders
-Implement real-time anomaly alerts
-Improve feature engineering
-Compare multiple anomaly detection models
+Future Work:
+Use real production log datasets
+Add time-series anomaly detection
+Feature engineering (log patterns, frequency, sequences)
+Compare with other models (LOF, Autoencoders)
+Real-time anomaly detection pipeline
 
 
 How to Run
-Start Services
-docker run -d -p 6379:6379 redis
-docker run -d -p 5432:5432 -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=logs_db postgres
+1. Start services (Docker)
+docker start redis
+docker start postgres
 
-Start API
+
+2. Run API
 uvicorn api:app --reload
 
-Start Worker
+
+3. Run worker
 python worker.py
 
-Generate Logs
-python generator.py
 
-Run Analysis
-python analysis.py
+4. Generate logs
+python generate_logs.py
+
+
+5. Run anomaly detection
 python anomaly.py
 
 
-What This Project Demonstrates:
-Distributed system design
-Queue-based architecture
-Fault-tolerant backend engineering
-Data pipeline construction
-Applied machine learning
-Analytical thinking and evaluation
+6. Run analysis
+python analysis.py
+
+
+Technologies Used:
+Python
+FastAPI
+Redis
+PostgreSQL
+Pandas
+Scikit-learn
+Matplotlib
 
 
 Conclusion
-This project demonstrates how backend systems and machine learning can be combined to build scalable, reliable pipelines that not only process data but also extract meaningful insights automatically.
+This project demonstrates how a production-style log pipeline can be combined with machine learning to explore anomaly detection. While the system successfully identifies unusual patterns, it also highlights the limitations of unsupervised methods and synthetic data.
 
-
+Author
+GitHub: https://github.com/stoic-bruh/log-ingestion-pipeline
